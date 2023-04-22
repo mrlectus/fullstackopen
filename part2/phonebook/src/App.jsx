@@ -8,17 +8,15 @@ const App = () => {
   const [notify, setNotify] = useState('');
   const [newName, setNewName] = useState('');
   const [number, setNumber] = useState('');
-  const [filterPerson, setFilterPerson] = useState([]);
   const [filterText, setFilterText] = useState('');
 
   const showPersons = async () => {
-    const response = await axios.get('http://localhost:3001/persons');
+    const response = await axios.get('/api/persons');
     const data = response.data;
-    console.log('rende');
     setPersons(data);
   };
 
-  useEffect(() => async () => showPersons(), []);
+  useEffect(() => showPersons(), []);
 
   const handleSetPersons = async (event) => {
     event.preventDefault();
@@ -30,7 +28,7 @@ const App = () => {
           `${newName} is already added to phonebook, replace the old number with a new one?`
         )
       ) {
-        await axios.put(`http://localhost:3001/persons/${id}`, {
+        await axios.put(`/api/persons/${id}`, {
           name: newName,
           number: number,
         });
@@ -38,7 +36,7 @@ const App = () => {
       return;
     }
     try {
-      const request = await axios.post('http://localhost:3001/persons', {
+      const request = await axios.post('/api/persons', {
         name: newName,
         number: number,
       });
@@ -49,7 +47,7 @@ const App = () => {
       }, 3000);
       return request.data;
     } catch (err) {
-      console.log('error');
+      console.log(`error ${err}`);
     }
   };
 
@@ -60,8 +58,10 @@ const App = () => {
       )
     ) {
       try {
-        await axios.delete(`http://localhost:3001/persons/${id}`);
-        setPersons(persons.filter((person) => person.id !== id));
+        await axios.delete(`/api/persons/${id}`);
+        setPersons((prevPerson) =>
+          prevPerson.filter((person) => person.id !== id)
+        );
       } catch (err) {
         setNotify(
           `information of ${newName} has already been removed from the server`
@@ -73,13 +73,9 @@ const App = () => {
     }
   };
 
-  const handleFilterPerson = (event) => {
-    event.preventDefault();
-    const check = persons.filter((person) =>
-      person.name.toLowerCase().match(filterText.toLowerCase())
-    );
-    setFilterPerson(check);
-  };
+  const filteredPerson = persons.filter((person) =>
+    person.name.toLowerCase().match(filterText.toLowerCase())
+  );
 
   return (
     <div>
@@ -125,23 +121,27 @@ const App = () => {
             add
           </button>
         </div>
+        <p className="font-bold">Numbers</p>
+        <table className="table-auto text-left">
+          <tbody>
+            {filteredPerson.map((person) => (
+              <tr key={person.id}>
+                <td>{person.name}</td>
+                <td> {person.number}</td>
+                <td>
+                  <button
+                    onClick={() => handleDeletePerson(person.id)}
+                    id={person.id}
+                    className="border hover:bg-red-300 outline-none border-red-500 rounded-md p-2"
+                  >
+                    delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </form>
-      <h2>
-        <b>Numbers</b>
-      </h2>
-      {persons.map((person) => (
-        <div key={person.id}>
-          <p>
-            {person.name} {person.number}{' '}
-            <button
-              onClick={() => handleDeletePerson(person.id)}
-              id={person.id}
-            >
-              delete
-            </button>
-          </p>
-        </div>
-      ))}
     </div>
   );
 };
