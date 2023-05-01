@@ -32,6 +32,7 @@ const App = () => {
           name: newName,
           number: number,
         });
+        setPersons([...persons]);
       }
       return;
     }
@@ -82,8 +83,8 @@ const App = () => {
       <h2>
         <b>Phonebook</b>
       </h2>
-      <form className="flex flex-col gap-2 p-2 items-center">
-        <div className="flex flex-col w-scren items-center justify-center">
+      <form className="flex flex-col gap-2 p-2 items-center justify-center">
+        <div className="flex flex-col gap-3 w-full items-center justify-center">
           {notify && (
             <h1 className="h-10 w-full my-2 p-2 border rounded-md bg-green-500">
               {notify}
@@ -120,27 +121,27 @@ const App = () => {
           >
             add
           </button>
+          <p className="font-bold">Numbers</p>
+          <table className="table-auto border-spacing-y-2 border-spacing-x-4 w-full border-separate flex justify-center text-left">
+            <tbody>
+              {filteredPerson.map((person) => (
+                <tr key={person.id}>
+                  <td>{person.name}</td>
+                  <td className="w-12"> {person.number}</td>
+                  <td>
+                    <button
+                      onClick={() => handleDeletePerson(person.id)}
+                      id={person.id}
+                      className="border hover:bg-red-300 outline-none border-red-500 rounded-md p-2"
+                    >
+                      delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <p className="font-bold">Numbers</p>
-        <table className="table-auto text-left">
-          <tbody>
-            {filteredPerson.map((person) => (
-              <tr key={person.id}>
-                <td>{person.name}</td>
-                <td> {person.number}</td>
-                <td>
-                  <button
-                    onClick={() => handleDeletePerson(person.id)}
-                    id={person.id}
-                    className="border hover:bg-red-300 outline-none border-red-500 rounded-md p-2"
-                  >
-                    delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </form>
     </div>
   );
